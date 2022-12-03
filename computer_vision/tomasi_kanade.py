@@ -28,19 +28,18 @@ W_new = (U_array[0],U_array[1],U_array[2],U_array[3],V_array[0],V_array[1],V_arr
 
 u,s,vh = np.linalg.svd(W_new,full_matrices=True)
 s = np.diag(s)
-zeros = np.zeros((2*F,len(U)-2*F))
-s = np.append(s,zeros)
-s = np.reshape(s,(8,65))
-#print(u)
+
 #rank constraint
 u_1 = u[:,0:3]
-print(u_1)
-vh_1 = vh[:,0:3]
+#print(u_1)
+vh_1 = vh[0:3,:]
+#print(vh_1)
 s_1 = s[0:3,0:3]
+#print(s_1)
 
 M = np.dot(u_1,np.sqrt(s_1))
-#print(M)
-S = np.dot(vh_1,np.sqrt(s_1))
+
+S = np.dot(np.sqrt(s_1),vh_1)
 
 Q = []
 R = []
@@ -54,13 +53,21 @@ for i in range(F):
     G = M[2*i-1,:]
     d = G[0]
     e = G[1]
-    f = G[2]
+    f = G[2] 
 
-print('done')    
-
-    # Q = [Q
-    #      a*a a*b+b*a a*c+c*a b*b c*b+b*c c*c,
-    #      d*d d*e+e*d d*f+f*d e*e f*e+e*f f*f,
-    #      a*d a*e+b*d a*f+c*d b*e b*f+e*c c*f]
+    Q.append([a*a,a*b+b*a,a*c+c*a,b*b,c*b+b*c,c*c])
+    Q.append([d*d,d*e+e*d,d*f+f*d,e*e,f*e+e*f,f*f])
+    Q.append([a*d,a*e+b*d,a*f+c*d,b*e,b*f+e*c,c*f])
         
-    # R = [R, 1, 1, 0]
+    R.append([1])
+    R.append([1])
+    R.append([0])
+
+print(Q)
+print(R)  
+
+l,resid,rank,s = np.linalg.lstsq(Q,R)
+print(l)
+
+L = [[l[0], l[1], l[2]],[l[1], l[3], l[4]],[l[2], l[4], l[5]]]
+print(L)
